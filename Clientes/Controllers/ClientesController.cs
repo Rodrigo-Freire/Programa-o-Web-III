@@ -37,7 +37,41 @@ namespace Clientes.Controllers
             Cliente cliente = clientes.FirstOrDefault(p => p.nome == nome);
             return Ok(cliente);
         }
-   
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public ActionResult<Cliente> Inserir([FromBody]Cliente cliente)
+        {
+            clientes.Add(cliente);
+            return CreatedAtAction(nameof(ConsultarPessoa), cliente);
+
+        }
+        [HttpPut("consultar/{inderx}/cliente")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Cliente>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Alterar([FromRoute] int index, [FromBody] Cliente cliente)
+        {
+            if (index < 0 || index > 1)
+            {
+                return BadRequest();
+            }
+
+            Response.Headers.Add("rastreamento", "123456789");
+            clientes[index] = cliente;
+            return Ok(clientes);
+        }
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public IActionResult Deletar([FromQuery] string nome)
+        {
+            Cliente deletarCliente = clientes.FirstOrDefault(p => p.nome== nome);
+            if (deletarCliente == null)
+            {
+                return BadRequest();
+            }
+            clientes.Remove(deletarCliente);
+            return NoContent();
+        } 
 
 
     }
